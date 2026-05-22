@@ -10,6 +10,7 @@ public:
     void AddEvent(Event event) { _queue.push(event); };
     void AddHandler(std::function<void(const Event&)> fn) { _handler = fn; };
 
+    // is it worth marking this noexcept?
     void run();
 
 private:

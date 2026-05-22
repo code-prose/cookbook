@@ -1,13 +1,9 @@
 #include "types.h"
 #include "event_loop.h"
-#include <print>
-#include <cstdio>
+#include <stdexcept>
 
 void EventLoop::run() {
-    if (_handler == nullptr) {
-        std::print(stderr, "Please register a fn");
-        exit(127);
-    }
+    if (!_handler) throw std::runtime_error("No registered event handler");
 
     while(!_queue.empty()) {
         Event event = _queue.top();
