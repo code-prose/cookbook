@@ -22,14 +22,13 @@ DataFeed::Iterator& DataFeed::Iterator::operator++() {
     std::int64_t since_epoch = std::stoll(parts[0]);
     Time timestamp{ std::chrono::nanoseconds(since_epoch) };
     std::string instrument = parts[1];
-    Event event;
 
     // getting fucked by branch prediction in multiple places
     if (parts[2] == "trade") {
         // parsing logic
         int quant = std::stoi(parts[4]);
         if (quant < 0) throw std::runtime_error("Quantity < 0");
-        Quantity quantity{ (std::uint32_t)quant };
+        Quantity quantity{ static_cast<std::uint32_t>(quant)};
         Side side;
         if (parts[5] == "buy") {
             side = Side::Buy;
@@ -38,19 +37,21 @@ DataFeed::Iterator& DataFeed::Iterator::operator++() {
         }
 
         TradeEvent tradeEvent{ std::stoi(parts[3]), side, quantity };
-        event = Event{ timestamp, instrument, tradeEvent };
+        Event event{ timestamp, instrument, tradeEvent };
 
     } else {
         int bQuant = std::stoi(parts[9]);
         int aQuant = std::stoi(parts[7]);
         if (bQuant < 0) throw std::runtime_error("Bid quantity < 0");
         if (aQuant < 0) throw std::runtime_error("Ask quantity < 0");
-        Quantity buyQuantity{ (std::uint32_t)bQuant};
-        Quantity askQuantity{ (std::uint32_t)aQuant};
+        Quantity buyQuantity{ static_cast<std::uint32_t>(bQuant)};
+        Quantity askQuantity{ static_cast<std::uint32_t>(aQuant)};
         QuoteEvent quoteEvent{ std::stoi(parts[8]), buyQuantity, std::stoi(parts[6]), askQuantity};
-        event = Event{ timestamp, instrument, quoteEvent};
+        Event event{ timestamp, instrument, quoteEvent};
 
     }
+
+    return *this
 
     
 
