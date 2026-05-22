@@ -2,7 +2,7 @@
 
 #include "types.h"
 #include "data_feed.h"
-#include <ranges>
+#include <chrono>
 
 const Event& DataFeed::Iterator::operator*() const {
     return _current;
@@ -11,9 +11,49 @@ const Event& DataFeed::Iterator::operator*() const {
 DataFeed::Iterator& DataFeed::Iterator::operator++() {
     std::string line;
     std::getline(_feed->_fs, line);
+    std::stringstream ss(line);
 
-    auto parts = line | std::views::split(',');
-    // timestamp, id, type, trade_price, trade_quantity, side, ask_price, ask_quantity, bid_price, bid_quantity
+    std::string item;
+    std::vector<std::string> parts;
+    while (std::getline(ss, item, ',')) {
+        parts.push_back(item);
+    }
+
+    // 0: timestamp, 1: id, 2: type, 3: trade_price, 4: trade_quantity, 5: side, 6: ask_price, 7: ask_quantity, 8: bid_price, 9: bid_quantity
+    std::int64_t since_epoch = std::stoll(parts[0]);
+    Time timestamp{ std::chrono::nanoseconds(since_epoch) };
+    std::string instrument = parts[1];
+    Event event;
+
+    // getting fucked by branch prediction probably
+    if (parts[2] == "trade") {
+        // parsing logic
+        std::int16_t quant = std::stoi(parts[3]);
+        if (quant < 0) throw std::runtime_error("Quantity < 0");
+        Quantity quantity{quant};
+        TradeEvent tradeEvent{ parts[3], parts[4], quantity };
+        event = Event{ timestamp, instrument, tradeEvent };
+
+    } else {
+        // parsing logic
+        if (parts[5] == "buy") {
+            std::int16_t bQuant = std::stoi(parts[9]);
+            if (bQuant < 0) throw std::runtime_error("Bid quantity < 0");
+            Quantity quantity{bQuant};
+            QuoteEvent tradeEvent{ };
+
+        } else {
+            std::int16_t aQuant = std::stoi(parts[7]);
+            if (aQuant < 0) throw std::runtime_error("Ask quantity < 0");
+            Quantity quantity{aQuant};
+            QuoteEvent tradeEvent{ };
+
+        }
+
+        event = Event{ timestamp, instrument, tradeEvent};
+    }
+
+    event = Event{ timestamp, parts[1], tradeEvent};
     
 
 };

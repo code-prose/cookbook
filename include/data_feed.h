@@ -8,6 +8,10 @@ public:
 
     DataFeed(const std::string& path) {
         _fs = std::ifstream(path);
+        std::string line;
+
+        // discard headers
+        std::getline(_fs, line);
     }
 
     struct Iterator {
