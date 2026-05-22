@@ -1,5 +1,3 @@
-#pragma once
-
 #include "types.h"
 #include "data_feed.h"
 #include <chrono>
