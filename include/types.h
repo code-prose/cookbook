@@ -45,4 +45,8 @@ struct Event {
     // I can swap this from str to u8 later so I don't have to pay the price of str allocation? Not sure how this works in c++ vs Rust...
     std::string instrument;
     std::variant<TradeEvent, QuoteEvent> payload;
+
+    bool operator<(const Event& other) const {
+        return timestamp < other.timestamp;
+    };
 };
