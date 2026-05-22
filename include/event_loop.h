@@ -12,8 +12,6 @@ public:
     void run();
 
 private:
-    Event FetchEvent() const;
-
     std::priority_queue<Event, std::vector<Event>, std::greater<Event>> _queue;
     std::function<void(const Event&)> _handler;
 };
