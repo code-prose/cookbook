@@ -25,7 +25,7 @@ DataFeed::Iterator& DataFeed::Iterator::operator++() {
     std::string instrument = parts[1];
     Event event;
 
-    // getting fucked by branch prediction probably
+    // getting fucked by branch prediction in multiple places
     if (parts[2] == "trade") {
         // parsing logic
         std::int16_t quant = std::stoi(parts[3]);
@@ -40,20 +40,18 @@ DataFeed::Iterator& DataFeed::Iterator::operator++() {
             std::int16_t bQuant = std::stoi(parts[9]);
             if (bQuant < 0) throw std::runtime_error("Bid quantity < 0");
             Quantity quantity{bQuant};
-            QuoteEvent tradeEvent{ };
-
+            QuoteEvent quoteEvent{ };
+            event = Event{ timestamp, instrument, quoteEvent};
         } else {
             std::int16_t aQuant = std::stoi(parts[7]);
             if (aQuant < 0) throw std::runtime_error("Ask quantity < 0");
             Quantity quantity{aQuant};
-            QuoteEvent tradeEvent{ };
-
+            QuoteEvent quoteEvent{ };
+            event = Event{ timestamp, instrument, quoteEvent};
         }
 
-        event = Event{ timestamp, instrument, tradeEvent};
     }
 
-    event = Event{ timestamp, parts[1], tradeEvent};
     
 
 };
