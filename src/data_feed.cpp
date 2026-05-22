@@ -51,10 +51,7 @@ DataFeed::Iterator& DataFeed::Iterator::operator++() {
 
     }
 
-    return *this
-
-    
-
+    return *this;
 };
 
 DataFeed::Iterator DataFeed::begin() {
