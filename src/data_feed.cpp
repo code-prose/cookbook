@@ -1,6 +1,7 @@
 #include "types.h"
 #include "data_feed.h"
 #include <chrono>
+#include <sstream>
 
 const Event& DataFeed::Iterator::operator*() const {
     return _current;
@@ -29,24 +30,25 @@ DataFeed::Iterator& DataFeed::Iterator::operator++() {
         std::int16_t quant = std::stoi(parts[3]);
         if (quant < 0) throw std::runtime_error("Quantity < 0");
         Quantity quantity{quant};
-        TradeEvent tradeEvent{ parts[3], parts[4], quantity };
+        Side side;
+        if (parts[4] == "buy") {
+            side = Side::Buy;
+        } else {
+            side = Side::Sell;
+        }
+
+        TradeEvent tradeEvent{ std::stoi(parts[3]), side, quantity };
         event = Event{ timestamp, instrument, tradeEvent };
 
     } else {
-        // parsing logic
-        if (parts[5] == "buy") {
-            std::int16_t bQuant = std::stoi(parts[9]);
-            if (bQuant < 0) throw std::runtime_error("Bid quantity < 0");
-            Quantity quantity{bQuant};
-            QuoteEvent quoteEvent{ };
-            event = Event{ timestamp, instrument, quoteEvent};
-        } else {
-            std::int16_t aQuant = std::stoi(parts[7]);
-            if (aQuant < 0) throw std::runtime_error("Ask quantity < 0");
-            Quantity quantity{aQuant};
-            QuoteEvent quoteEvent{ };
-            event = Event{ timestamp, instrument, quoteEvent};
-        }
+        std::int16_t bQuant = std::stoi(parts[9]);
+        std::int16_t aQuant = std::stoi(parts[7]);
+        if (bQuant < 0) throw std::runtime_error("Bid quantity < 0");
+        if (aQuant < 0) throw std::runtime_error("Ask quantity < 0");
+        Quantity buyQuantity{bQuant};
+        Quantity askQuantity{aQuant};
+        QuoteEvent quoteEvent{ };
+        event = Event{ timestamp, instrument, quoteEvent};
 
     }
 
