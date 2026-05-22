@@ -20,6 +20,8 @@ public:
         bool operator!=(const Iterator& other) const;
     };
 
+    friend struct Iterator;
+
 
     Iterator begin();
     Iterator end();
