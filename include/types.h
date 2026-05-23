@@ -49,5 +49,13 @@ struct Event {
 
     bool operator<(const Event& other) const {
         return timestamp < other.timestamp;
-    };
+    }
+
+    bool operator>(const Event& other) const {
+        return timestamp > other.timestamp;
+    }
+
+    bool operator==(const Event& other) const {
+        return timestamp == other.timestamp;
+    }
 };
