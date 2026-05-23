@@ -72,9 +72,13 @@ Event DataFeed::ParseEvent() {
 }
 
 DataFeed::Iterator DataFeed::begin() {
-    Event first_event = ParseEvent();
-    DataFeed::Iterator iter = {this, first_event, false};
-    return iter;
+    try {
+        Event first_event = ParseEvent();
+        DataFeed::Iterator iter = {this, first_event, false};
+        return iter;
+    } catch (const std::runtime_error& e) {
+        throw e;
+    }
 };
 
 DataFeed::Iterator DataFeed::end() {
