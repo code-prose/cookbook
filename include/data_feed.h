@@ -32,4 +32,5 @@ public:
 
 private:
     std::ifstream _fs;
+    Event ParseEvent();
 };

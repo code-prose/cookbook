@@ -2,14 +2,31 @@
 #include "data_feed.h"
 #include <chrono>
 #include <sstream>
+#include <stdexcept>
 
 const Event& DataFeed::Iterator::operator*() const {
     return _current;
 };
 
 DataFeed::Iterator& DataFeed::Iterator::operator++() {
+    try {
+        _current = _feed->ParseEvent();
+    } catch (const std::runtime_error&){
+        _done = true;
+    }
+    return *this;
+};
+
+bool DataFeed::Iterator::operator!=(const Iterator& other) const {
+    return _done != other._done;
+}
+
+
+Event DataFeed::ParseEvent() {
     std::string line;
-    std::getline(_feed->_fs, line);
+    if (!std::getline(_fs, line)) {
+        throw std::runtime_error("Could not parse line from input");
+    }
     std::stringstream ss(line);
 
     std::string item;
@@ -37,7 +54,8 @@ DataFeed::Iterator& DataFeed::Iterator::operator++() {
         }
 
         TradeEvent tradeEvent{ std::stoi(parts[3]), side, quantity };
-        Event event{ timestamp, instrument, tradeEvent };
+        return Event{ timestamp, instrument, tradeEvent };
+
 
     } else {
         int bQuant = std::stoi(parts[9]);
@@ -47,17 +65,19 @@ DataFeed::Iterator& DataFeed::Iterator::operator++() {
         Quantity buyQuantity{ static_cast<std::uint32_t>(bQuant)};
         Quantity askQuantity{ static_cast<std::uint32_t>(aQuant)};
         QuoteEvent quoteEvent{ std::stoi(parts[8]), buyQuantity, std::stoi(parts[6]), askQuantity};
-        Event event{ timestamp, instrument, quoteEvent};
+        return Event{ timestamp, instrument, quoteEvent};
 
     }
 
-    return *this;
-};
+}
 
 DataFeed::Iterator DataFeed::begin() {
-
+    Event first_event = ParseEvent();
+    DataFeed::Iterator iter = {this, first_event, false};
+    return iter;
 };
 
 DataFeed::Iterator DataFeed::end() {
-
+    DataFeed::Iterator iter = {this, Event{ }, true}; 
+    return iter;
 };
