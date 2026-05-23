@@ -77,7 +77,7 @@ DataFeed::Iterator DataFeed::begin() {
         DataFeed::Iterator iter = {this, first_event, false};
         return iter;
     } catch (const std::runtime_error& e) {
-        throw e;
+        return end();
     }
 };
 
