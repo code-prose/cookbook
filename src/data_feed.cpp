@@ -53,7 +53,7 @@ Event DataFeed::ParseEvent() {
             side = Side::Sell;
         }
 
-        TradeEvent tradeEvent{ std::stoi(parts[3]), side, quantity };
+        TradeEvent tradeEvent{ std::stof(parts[3]), side, quantity };
         return Event{ timestamp, instrument, tradeEvent };
 
 
@@ -64,7 +64,7 @@ Event DataFeed::ParseEvent() {
         if (aQuant < 0) throw std::runtime_error("Ask quantity < 0");
         Quantity buyQuantity{ static_cast<std::uint32_t>(bQuant)};
         Quantity askQuantity{ static_cast<std::uint32_t>(aQuant)};
-        QuoteEvent quoteEvent{ std::stoi(parts[8]), buyQuantity, std::stoi(parts[6]), askQuantity};
+        QuoteEvent quoteEvent{ std::stof(parts[8]), buyQuantity, std::stof(parts[6]), askQuantity};
         return Event{ timestamp, instrument, quoteEvent};
 
     }

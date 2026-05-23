@@ -3,7 +3,8 @@
 #include <variant>
 #include <vector>
 
-using Price = std::int32_t;
+// using this for ease now... let's switch this back to unint32_t and change the parser and then handle the arithmetic for perf
+using Price = float;
 using Quantity = std::uint32_t;
 using OrderID = std::uint64_t;
 
