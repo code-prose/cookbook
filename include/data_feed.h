@@ -8,12 +8,14 @@ public:
 
     DataFeed(const std::string& path) {
         _fs = std::ifstream(path);
-        std::string line;
+        if (!_fs) throw std::runtime_error("Failed to open file: " + path);
 
         // discard headers
+        std::string line;
         std::getline(_fs, line);
     }
 
+    friend struct Iterator;
     struct Iterator {
         DataFeed* _feed;
         Event _current;
@@ -23,8 +25,6 @@ public:
         Iterator& operator++();
         bool operator!=(const Iterator& other) const;
     };
-
-    friend struct Iterator;
 
 
     Iterator begin();
