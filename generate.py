@@ -22,11 +22,14 @@ def main():
         noise = np.random.randint(1, 100)
         quantity.append(quantity[-1] + noise)
 
-    df = pl.DataFrame({"timestamp": timestamps}).with_columns(
-        id=pl.lit(instruments),
-        type=pl.lit(row_type),
-        price=price,
-        quantity=quantity,
+    df = pl.DataFrame({
+        "timestamp": timestamps,
+        "id": instruments,
+        "type": list(row_type),
+        "price": price,
+        "quantity": quantity,
+        "sides": list(sides),
+    }).with_columns(
 
         trade_price=pl
         .when(pl.col("type") == "trade")
@@ -38,7 +41,6 @@ def main():
         .then(pl.col("quantity"))
         .otherwise(None),
 
-        sides=sides,
         side=pl.when(pl.col("type") == "trade").then(pl.col("sides")).otherwise(None),
 
         ask_price=pl
