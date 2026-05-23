@@ -7,6 +7,8 @@ set(CMAKE_CXX_STANDARD 23)
 add_executable(cookbook
     src/main.cpp
     src/order.cpp
+    src/event_loop.cpp
+    src/data_feed.cpp
 )
 
 target_include_directories(cookbook PRIVATE include)

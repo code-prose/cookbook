@@ -2,6 +2,7 @@
 #include "order.h"
 #include <format>
 #include <memory>
+#include <numeric>
 
 void Order::Fill(Quantity quantity) {
     if (quantity > GetRemainingQuantity()) {
