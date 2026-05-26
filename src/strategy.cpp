@@ -26,7 +26,7 @@ void NaiveStrategy::OnTrade(const TradeEvent &event) {
     _balance -= event.price * _naiveQuantity;
     _position += _naiveQuantity;
     _nextOrder += 1;
-    std::print("ID {}:, Purchased for {} with quantity {} at ema: {}",
+    std::print("ID {}:, Purchased for {} with quantity {} at ema: {}\n",
                 _nextOrder - 1, event.price, _naiveQuantity, _ema);
   } else if (event.price > _ema * 1.00001) {
     auto order =
@@ -36,7 +36,7 @@ void NaiveStrategy::OnTrade(const TradeEvent &event) {
     _balance += event.price * _naiveQuantity;
     _position -= _naiveQuantity;
     _nextOrder += 1;
-    std::print("ID {}:, Sold for {} with quantity {} at ema: {}",
+    std::print("ID {}:, Sold for {} with quantity {} at ema: {}\n",
                 _nextOrder - 1, event.price, _naiveQuantity, _ema);
   }
 }
