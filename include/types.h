@@ -1,4 +1,5 @@
 #pragma once
+
 #include <chrono>
 #include <variant>
 #include <vector>
@@ -7,6 +8,9 @@
 using Price = float;
 using Quantity = std::uint32_t;
 using OrderID = std::uint64_t;
+
+using StrategyQuantity = std::int32_t;
+using StrategyBalance = float;
 
 
 enum class OrderType {

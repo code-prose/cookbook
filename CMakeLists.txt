@@ -9,6 +9,7 @@ add_executable(cookbook
     src/order.cpp
     src/event_loop.cpp
     src/data_feed.cpp
+    src/strategy.cpp
 )
 
 target_include_directories(cookbook PRIVATE include)
