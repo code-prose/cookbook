@@ -39,7 +39,7 @@ Generates `test_data.csv` with a variable number rows of synthetic BTC-USD trade
 
 ## Building
 
-Requires CMake 3.20+ and a C++23 compiler (Clang or GCC).
+Requires CMake 3.20+ and a C++23 compiler (Clang 17+ or GCC 14+).
 
 ```bash
 cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
