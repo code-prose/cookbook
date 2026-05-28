@@ -1,27 +1,27 @@
 import polars as pl
 import numpy as np
+import argparse
 
 
-def main():
-    # 0: timestamp, 1: id (instruments), 2: type, 3: trade_price, 4: trade_quantity, 5: side, 6: ask_price, 7: ask_quantity, 8: bid_price, 9: bid_quantity
-    ROWS = 100
+def generate(rows: int = 1000):
     start = np.datetime64("2024-01-01", "ns")
     step = np.timedelta64(1_000_000, "ns")
-    timestamps = [int((start + i * step).astype("int64")) for i in range(ROWS)]
-    instruments = ["TEST-ID" for _ in range(ROWS)]
-    row_type = np.random.choice(["quote", "trade"], p=[0.7, 0.3], size=ROWS)
-    sides = np.random.choice(["buy", "sell"], size=ROWS)
+    timestamps = [int((start + i * step).astype("int64")) for i in range(rows)]
+    instruments = ["TEST-ID" for _ in range(rows)]
+    row_type = np.random.choice(["quote", "trade"], p=[0.7, 0.3], size=rows)
+    sides = np.random.choice(["buy", "sell"], size=rows)
 
     price = [50000.0]
-    for _ in range(1, ROWS):
+    for _ in range(1, rows):
         noise = np.random.normal(0, 1)
         price.append(price[-1] + noise)
 
     quantity = [150]
-    for _ in range(1, ROWS):
+    for _ in range(1, rows):
         noise = np.random.randint(1, 100)
         quantity.append(quantity[-1] + noise)
 
+    # 0: timestamp, 1: id (instruments), 2: type, 3: trade_price, 4: trade_quantity, 5: side, 6: ask_price, 7: ask_quantity, 8: bid_price, 9: bid_quantity
     df = pl.DataFrame({
         "timestamp": timestamps,
         "id": instruments,
@@ -70,4 +70,16 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(
+        prog='Market Data Generator',
+        description='Generates CSV containing quote and trade events for pasing with backtesting engine',
+        epilog=''
+    )
+    parser.add_argument('-r', '--rows')
+
+    args = parser.parse_args()
+
+    try:
+        generate(rows=int(args.rows))
+    except ValueError:
+        print(f"Argument for --rows: {args.rows} is not an integer")
