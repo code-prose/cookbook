@@ -32,10 +32,16 @@ timestamp, instrument, type, trade_price, trade_quantity, side, ask_price, ask_q
 Requires Python with `polars` and `numpy`:
 
 ```bash
-uv run python generate.py
+uv run generate.py
+```
+Supports arg parsing for row inpu
+
+```bash
+uv run generate.py --rows 10000
 ```
 
-Generates `test_data.csv` with a variable number rows of synthetic BTC-USD trade and quote events using a random walk price model.
+Generates `test_data.csv` with a variable number rows (default to 1k) of synthetic BTC-USD trade and quote events using a random walk price model.
+
 
 ## Building
 
