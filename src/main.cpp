@@ -15,7 +15,6 @@ int main(int argc, char * argv[]) {
 
     for (auto& event : data_feed) {
         event_loop.AddEvent(event);
-        std::print("{}: {}\n", event.instrument, event.timestamp);
     }
 
     event_loop.run();
