@@ -54,6 +54,11 @@ Trades OrderBook::MatchOrders() {
             ask->Fill(quantity);
 
 
+            trades.push_back(Trade{
+                TradeInfo{ bid->GetOrderID(), bid->GetPrice(), quantity },
+                TradeInfo{ ask->GetOrderID(), ask->GetPrice(), quantity },
+            });
+
             if (bid->IsFilled()) {
                 _orders.erase(bid->GetOrderID());
                 bids.pop_front();
@@ -71,11 +76,6 @@ Trades OrderBook::MatchOrders() {
             if (asks.empty()) {
                 _asks.erase(askPrice);
             }
-
-            trades.push_back(Trade{
-                TradeInfo{ bid->GetOrderID(), bid->GetPrice(), quantity },
-                TradeInfo{ ask->GetOrderID(), ask->GetPrice(), quantity },
-            });
         }
     }
 
