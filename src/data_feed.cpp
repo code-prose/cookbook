@@ -41,7 +41,7 @@ Event DataFeed::ParseEvent() {
     std::string instrument = parts[1];
 
     // getting fucked by branch prediction in multiple places
-    if (parts[2] == "trade") {
+    if (parts[2] == "trade") [[unlikely]] {
         // parsing logic
         int quant = std::stoi(parts[4]);
         if (quant < 0) throw std::runtime_error("Quantity < 0");
@@ -57,7 +57,7 @@ Event DataFeed::ParseEvent() {
         return Event{ timestamp, instrument, tradeEvent };
 
 
-    } else {
+    } else [[likely]] {
         int bQuant = std::stoi(parts[9]);
         int aQuant = std::stoi(parts[7]);
         if (bQuant < 0) throw std::runtime_error("Bid quantity < 0");
