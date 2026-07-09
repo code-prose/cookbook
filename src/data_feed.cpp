@@ -41,6 +41,9 @@ Event DataFeed::ParseEvent() {
     std::string instrument = parts[1];
 
     // getting fucked by branch prediction in multiple places
+    // is there a better way to parse this?
+    // could I change the format?
+    // is there a way to get this information without string comparison?
     if (parts[2] == "trade") [[unlikely]] {
         // parsing logic
         int quant = std::stoi(parts[4]);
