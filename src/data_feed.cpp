@@ -29,6 +29,7 @@ Event DataFeed::ParseEvent() {
     }
     std::stringstream ss(line);
 
+    // string allocation every single loop iteration
     std::string item;
     std::vector<std::string> parts;
     while (std::getline(ss, item, ',')) {
@@ -51,7 +52,6 @@ Event DataFeed::ParseEvent() {
     // I know that the first letter after the first comma is always a T or a Q
     // what it be faster to do a SIMD pass over first to determine the type?
     // ... does this even work? I would need a different # of something to determine
-    // I also don't love that std::variant has a vtable chase
     if (parts[2] == "trade") [[unlikely]] {
         // parsing logic
         int quant = std::stoi(parts[4]);
