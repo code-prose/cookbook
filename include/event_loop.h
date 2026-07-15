@@ -17,5 +17,6 @@ public:
 private:
     // might want to write custom ctor to reserver... can get to this during perf
     std::priority_queue<Event, std::vector<Event>, std::greater<Event>> _queue;
+    // I should be more specific than std::function, because of type erase, I am losing some perf
     std::function<void(const Event&)> _handler = nullptr;
 };
