@@ -18,9 +18,10 @@ One row per change; change ONE thing, re-run, append.
 
 ## Results
 
-| date       | change                    | runs (s)          | µs/event | notes |
-|------------|---------------------------|-------------------|----------|-------|
-| 2026-07-14 | baseline (unmodified)     | 2.80 / 2.46 / 2.49 | ~1.25   | see profile below |
+| date       | change                          | runs (s) real      | µs/event | notes |
+|------------|---------------------------------|--------------------|----------|-------|
+| 2026-07-14 | baseline (unmodified)           | 2.80 / 2.46 / 2.49 | ~1.25    | see profile below |
+| 2026-07-14 | reuse `_line` member buffer     | 2.60 / 2.31 / 2.33 | ~1.17    | ~6% vs baseline (warm runs); removes getline alloc/event. `stringstream` still copies `_line`. user=2.22s |
 
 ## Baseline profile (2026-07-14, `sample`, 2s)
 Leaf hotspots: `_platform_memmove` (string copies), `_free` + `_nanov2_free` (dealloc),
@@ -32,3 +33,11 @@ Hot lines in `ParseEvent`:
 - L36 `parts.push_back` — 182
 - L30 `stringstream` ctor — 59
 - L80/73/74 `stof`/`stoi`
+
+## C1
+- L27 `getline` - 414
+- L35 field `getline` - 409
+- L36 `parts.push_back` - 219
+- L30 `stringsteam` ctor - 59
+- L40 `Time` ctor - 57
+- L80 `QuoteEvent` ctor - 35
