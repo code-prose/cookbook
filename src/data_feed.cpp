@@ -23,13 +23,13 @@ bool DataFeed::Iterator::operator!=(const Iterator& other) const {
 
 
 Event DataFeed::ParseEvent() {
-    std::string line;
-    if (!std::getline(_fs, line)) {
+    // stopping string allocation every single loop iteration
+    if (!std::getline(_fs, _line)) {
         throw std::runtime_error("Could not parse line from input");
     }
-    std::stringstream ss(line);
+    std::stringstream ss(_line);
 
-    // string allocation every single loop iteration
+    // string allocation every single comma, could use std::string_view
     std::string item;
     std::vector<std::string> parts;
     while (std::getline(ss, item, ',')) {
