@@ -11,8 +11,7 @@ public:
         if (!_fs) throw std::runtime_error("Failed to open file: " + path);
 
         // discard headers
-        std::string line;
-        std::getline(_fs, line);
+        std::getline(_fs, _line);
     }
 
     friend struct Iterator;
