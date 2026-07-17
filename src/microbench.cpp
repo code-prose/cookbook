@@ -1,2 +1,3 @@
-#include <data_feed.h>
+#include "benchmark.h"
 
+BENCHMARK_MAIN();

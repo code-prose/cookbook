@@ -166,7 +166,7 @@ Trades OrderBook::MatchOrder(OrderModify order) {
         return { };
     }
 
-    const auto& [existingOrder, _] = _orders.at(order.GetOrderID());
+    const auto existingOrder = _orders.at(order.GetOrderID())._order;
     CancelOrder(order.GetOrderID());
     return AddOrder(order.ToOrderPointer(existingOrder->GetOrderType()));
 }
