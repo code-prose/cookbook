@@ -30,6 +30,7 @@ public:
         std::getline(_fs, _line);
     }
 
+    // how do I implement and iterator for mmap?
     friend struct Iterator;
     struct Iterator {
         DataFeed* _feed;
