@@ -89,6 +89,7 @@ DataFeed::Iterator DataFeed::begin() {
         Event first_event = ParseEvent();
         DataFeed::Iterator iter = {this, first_event, false};
         return iter;
+    // should I get rid of this?
     } catch (const std::runtime_error& e) {
         return end();
     }
