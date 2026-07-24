@@ -7,7 +7,7 @@ def generate(rows: int = 1000):
     start = np.datetime64("2024-01-01", "ns")
     step = np.timedelta64(1_000_000, "ns")
     timestamps = [int((start + i * step).astype("int64")) for i in range(rows)]
-    instruments = ["TEST-ID" for _ in range(rows)]
+    instruments = np.random.choice(["PLTR", "TSLA", "AAPL", "GOOGL"], p=[0.25, 0.25, 0.25, 0.25], size=rows)
     row_type = np.random.choice(["quote", "trade"], p=[0.7, 0.3], size=rows)
     sides = np.random.choice(["buy", "sell"], size=rows)
 
