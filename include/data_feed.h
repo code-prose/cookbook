@@ -1,6 +1,7 @@
 #pragma once
 #include <fstream>
 #include <exception>
+#include <iostream>
 
 #include <sys/mman.h>
 #include <fcntl.h>
@@ -22,6 +23,8 @@ public:
         fstat(fd, &file_stats);
 
         auto res = mmap(0, file_stats.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+        for (auto itr = res; res != )
+
         if (res == MAP_FAILED) std::terminate();
         // _fs = std::ifstream(path);
         // if (!_fs) throw std::runtime_error("Failed to open file: " + path);
