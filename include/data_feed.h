@@ -1,7 +1,6 @@
 #pragma once
 #include <fstream>
 #include <exception>
-#include <iostream>
 
 #include <sys/mman.h>
 #include <fcntl.h>
