@@ -7,12 +7,13 @@
 #include <sys/stat.h>
 
 #include "types.h"
+#include "mapped.h"
 
 
 class DataFeed {
 public:
 
-    DataFeed(const std::string& path) {
+    DataFeed(const std::string& path, MappedFile& mfile) {
         // might need to specify some offset depending on how big the mapped file is
 
         // test_data.csv is 169359815 bytes,  ~161mb... I don't think I can map something this large
@@ -49,7 +50,7 @@ public:
     Iterator end();
 
 private:
-    std::ifstream _fs;
-    std::string _line;
+    MappedFile mfile_;
+    std::string line_;
     Event ParseEvent();
 };
