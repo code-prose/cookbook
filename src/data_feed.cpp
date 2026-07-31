@@ -24,6 +24,7 @@ bool DataFeed::Iterator::operator!=(const Iterator& other) const {
 
 Event DataFeed::ParseEvent() {
     // stopping string allocation every single loop iteration
+    // need to use mapped struct here
     if (!std::getline(_fs, _line)) {
         throw std::runtime_error("Could not parse line from input");
     }
