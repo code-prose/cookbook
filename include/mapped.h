@@ -24,6 +24,9 @@ struct MappedFile {
     }
 
     void close() {
+        if (fd_ == -1) std::terminate();
+        if (mapped_ == MAP_FAILED) std::terminate();
+
         munmap(mapped_, size_);
     }
 
