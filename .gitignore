@@ -3,3 +3,4 @@ build/
 cookbook
 compile_commands.json
 test_data.csv
+test
