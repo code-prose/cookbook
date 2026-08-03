@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 #include <exception>
+#include <iostream>
+#include <string_view>
 
 #include <sys/mman.h>
 #include <fcntl.h>
@@ -10,29 +12,49 @@ struct MappedFile {
     MappedFile(const std::string& path) : path_{path} {}
     void open() {
         fd_ = ::open(path_.c_str(), O_RDONLY);
-        if (fd_ == -1) std::terminate();
+        if (fd_ == -1) {
+            std::cout << "Failed to open fd\n";
+            std::terminate();
+        }
 
         struct stat file_stats{};
         fstat(fd_, &file_stats);
         size_ = file_stats.st_size;
         // check result of fstat?
 
-        mapped_ = mmap(0, file_stats.st_size, PROT_READ, MAP_PRIVATE, fd_, 0);
-        if (mapped_ == MAP_FAILED) std::terminate();
-        
+        mapped_ = static_cast<const char*>(mmap(0, file_stats.st_size, PROT_READ, MAP_PRIVATE, fd_, 0));
+        if (mapped_ == MAP_FAILED) {
+            std::cout << "Failed to map file\n";
+            std::terminate();
+        }
+        curr_ = mapped_;
         // need to strip csv headers... maybe this lives not in the struct
     }
+
+    std::string_view read_line() {
+        auto bytes_left = eof_ - curr_;
+        const char* eol = static_cast<const char*>(std::memchr(curr_, '\n', bytes_left));
+        std::size_t sz = eol - curr_ + 1;
+        curr_ = eol + 1;
+        if (curr_ >= (char*)mapped_ + size_) return std::string_view{};
+
+        return std::string_view{curr_, sz};
+    }
+
+    std::size_t size() { return size_; }
 
     void close() {
         if (fd_ == -1) std::terminate();
         if (mapped_ == MAP_FAILED) std::terminate();
 
-        munmap(mapped_, size_);
+        munmap((void*)mapped_, size_);
     }
 
     private:
         int fd_{};
-        void* mapped_{};
+        const char* mapped_{};
+        const char* eof_{};
+        const char* curr_{};
         std::string path_{};
         std::size_t size_{};
 };
