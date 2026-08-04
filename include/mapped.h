@@ -42,9 +42,9 @@ struct MappedFile {
             std::cout << *(curr_ + i);
         }
         std::cout << '\n';
+        if (curr_ + 1< (char*)mapped_) return std::string_view{};
+        auto holder = std::string_view{curr_, sz};
         curr_ = eol + 1;
-        if (curr_ < (char*)mapped_) return std::string_view{};
-        auto holder = std::string_view{curr_ - 1, sz};
         // std::cout << holder;
         return holder;
     }
