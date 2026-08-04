@@ -38,14 +38,9 @@ struct MappedFile {
         auto bytes_left = eof_ - curr_;
         const char* eol = static_cast<const char*>(std::memchr(curr_, '\n', bytes_left));
         std::size_t sz = eol - curr_;
-        for (auto i{0uz}; i < sz; i++) {
-            std::cout << *(curr_ + i);
-        }
-        std::cout << '\n';
-        if (curr_ + 1< (char*)mapped_) return std::string_view{};
+        if (curr_ + 1 < (char*)mapped_) return std::string_view{};
         auto holder = std::string_view{curr_, sz};
         curr_ = eol + 1;
-        // std::cout << holder;
         return holder;
     }
 
