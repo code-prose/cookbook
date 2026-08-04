@@ -28,17 +28,25 @@ struct MappedFile {
             std::terminate();
         }
         curr_ = mapped_;
+
         // need to strip csv headers... maybe this lives not in the struct
+        const char* eol = static_cast<const char*>(std::memchr(curr_, '\n', 1000));
+        curr_ = eol + 1;
     }
 
     std::string_view read_line() {
         auto bytes_left = eof_ - curr_;
         const char* eol = static_cast<const char*>(std::memchr(curr_, '\n', bytes_left));
-        std::size_t sz = eol - curr_ + 1;
+        std::size_t sz = eol - curr_;
+        for (auto i{0uz}; i < sz; i++) {
+            std::cout << *(curr_ + i);
+        }
+        std::cout << '\n';
         curr_ = eol + 1;
-        if (curr_ >= (char*)mapped_ + size_) return std::string_view{};
-
-        return std::string_view{curr_, sz};
+        if (curr_ < (char*)mapped_) return std::string_view{};
+        auto holder = std::string_view{curr_ - 1, sz};
+        // std::cout << holder;
+        return holder;
     }
 
     std::size_t size() { return size_; }
