@@ -27,6 +27,7 @@ struct MappedFile {
             std::cout << "Failed to map file\n";
             std::terminate();
         }
+        eof_ = mapped_ + size_ - 1;
         curr_ = mapped_;
 
         // need to strip csv headers... maybe this lives not in the struct
@@ -34,11 +35,12 @@ struct MappedFile {
         curr_ = eol + 1;
     }
 
+    // this api design sucks
     std::string_view read_line() {
         auto bytes_left = eof_ - curr_;
         const char* eol = static_cast<const char*>(std::memchr(curr_, '\n', bytes_left));
         std::size_t sz = eol - curr_;
-        if (curr_ + 1 < (char*)mapped_) return std::string_view{};
+        if (curr_ + 1 > (char*)eof_) return std::string_view{};
         auto holder = std::string_view{curr_, sz};
         curr_ = eol + 1;
         return holder;
@@ -53,10 +55,10 @@ struct MappedFile {
         munmap((void*)mapped_, size_);
     }
 
+    const char* eof_{};
     private:
         int fd_{};
         const char* mapped_{};
-        const char* eof_{};
         const char* curr_{};
         std::string path_{};
         std::size_t size_{};
