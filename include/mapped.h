@@ -36,14 +36,14 @@ struct MappedFile {
     }
 
     // this api design sucks
-    std::string_view read_line() {
+    bool getline(std::string_view& sv) {
         auto bytes_left = eof_ - curr_;
         const char* eol = static_cast<const char*>(std::memchr(curr_, '\n', bytes_left));
         std::size_t sz = eol - curr_;
-        if (curr_ + 1 > (char*)eof_) return std::string_view{};
-        auto holder = std::string_view{curr_, sz};
+        if (curr_ + 1 > (char*)eof_) return false;
+        sv = std::string_view{curr_, sz};
         curr_ = eol + 1;
-        return holder;
+        return true;
     }
 
     std::size_t size() { return size_; }
