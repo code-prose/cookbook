@@ -20,7 +20,6 @@ struct MappedFile {
         struct stat file_stats{};
         fstat(fd_, &file_stats);
         size_ = file_stats.st_size;
-        // check result of fstat?
 
         mapped_ = static_cast<const char*>(mmap(0, file_stats.st_size, PROT_READ, MAP_PRIVATE, fd_, 0));
         if (mapped_ == MAP_FAILED) {
@@ -30,16 +29,15 @@ struct MappedFile {
         eof_ = mapped_ + size_ - 1;
         curr_ = mapped_;
 
-        // need to strip csv headers... maybe this lives not in the struct
         const char* eol = static_cast<const char*>(std::memchr(curr_, '\n', 1000));
         curr_ = eol + 1;
     }
 
-    // this api design sucks
     bool getline(std::string_view& sv) {
         auto bytes_left = eof_ - curr_;
         const char* eol = static_cast<const char*>(std::memchr(curr_, '\n', bytes_left));
         std::size_t sz = eol - curr_;
+        // need to fix condition
         if (curr_ + 1 > (char*)eof_) return false;
         sv = std::string_view{curr_, sz};
         curr_ = eol + 1;
