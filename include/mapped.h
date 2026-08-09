@@ -29,6 +29,9 @@ struct MappedFile {
         eof_ = mapped_ + size_ - 1;
         curr_ = mapped_;
 
+    }
+
+    void discard_headers() {
         const char* eol = static_cast<const char*>(std::memchr(curr_, '\n', 1000));
         curr_ = eol + 1;
     }
@@ -38,7 +41,11 @@ struct MappedFile {
         const char* eol = static_cast<const char*>(std::memchr(curr_, '\n', bytes_left));
         std::size_t sz = eol - curr_;
         // need to fix condition
-        if (curr_ + 1 > (char*)eof_) return false;
+        if (curr_ >= (char*)eof_) {
+            std::cout << (void*)curr_ << " " << eof_ << std::endl;
+            return false;
+        } 
+
         sv = std::string_view{curr_, sz};
         curr_ = eol + 1;
         return true;
