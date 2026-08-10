@@ -3,6 +3,8 @@
 #include <exception>
 #include <iostream>
 #include <string_view>
+#include <cstring>
+#include <vector>
 
 #include <sys/mman.h>
 #include <fcntl.h>
@@ -34,6 +36,20 @@ struct MappedFile {
     void discard_headers() {
         const char* eol = static_cast<const char*>(std::memchr(curr_, '\n', 1000));
         curr_ = eol + 1;
+    }
+
+    static std::vector<std::string_view> split_sv(std::string_view& sv) {
+        std::vector<std::string_view> vec{}; 
+        const char* comma = static_cast<const char*>(std::memchr(sv.begin(), ',', sv.size()));
+        const char* begin = sv.begin();
+        while(comma) {
+           vec.push_back(std::string_view{begin, static_cast<std::size_t>(comma - begin)}); 
+           begin = comma + 1;
+           comma = static_cast<const char*>(std::memchr(begin, ',', sv.size()));
+        }
+        // might need to grab the last one after the comma
+        vec.push_back(std::string_view{begin, static_cast<std::size_t>(sv.end() - sv.begin())});
+        return vec;
     }
 
     bool getline(std::string_view& sv) {
