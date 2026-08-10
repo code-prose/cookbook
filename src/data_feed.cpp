@@ -1,7 +1,6 @@
 #include "types.h"
 #include "data_feed.h"
 #include <chrono>
-#include <sstream>
 #include <stdexcept>
 
 const Event& DataFeed::Iterator::operator*() const {
@@ -21,7 +20,6 @@ bool DataFeed::Iterator::operator!=(const Iterator& other) const {
     return _done != other._done;
 }
 
-
 Event DataFeed::ParseEvent() {
     // stopping string allocation every single loop iteration
     // need to use mapped struct here
@@ -31,19 +29,15 @@ Event DataFeed::ParseEvent() {
     }
         
 
-    // string allocation every single comma, could use std::string_view
+    //te string allocation every single comma, could use std::string_view
     // if I don't allocate here then the lifetime is tied to mmap being open
-    std::string item;
-    std::vector<std::string> parts;
-    while (std::getline(sv, item, ',')) {
-        parts.push_back(item);
-    }
+    std::vector<std::string_view> parts{MappedFile::split_sv(sv)};
 
     // 0: timestamp, 1: id, 2: type, 3: trade_price, 4: trade_quantity, 5: side, 6: ask_price, 7: ask_quantity, 8: bid_price, 9: bid_quantity
     // can I use a better data format? can I mock a data stream?
-    std::int64_t since_epoch = std::stoll(parts[0]);
+    std::int64_t since_epoch = std::stoll(parts[0].data());
     Time timestamp{ std::chrono::nanoseconds(since_epoch) };
-    std::string instrument = parts[1];
+    std::string instrument = parts[1].data();
 
     // getting fucked by branch prediction in multiple places
     // is there a better way to parse this?
@@ -57,7 +51,7 @@ Event DataFeed::ParseEvent() {
     // do these have the same number of elements? could I change the data format and then precompute and do a cmov?
     if (parts[2] == "trade") [[unlikely]] {
         // parsing logic
-        int quant = std::stoi(parts[4]);
+        int quant = std::stoi(parts[4].data());
         if (quant < 0) throw std::runtime_error("Quantity < 0"); // kinda gross.. tom said to think about using less exceptions
         Quantity quantity{ static_cast<std::uint32_t>(quant)};
         Side side;
@@ -67,20 +61,20 @@ Event DataFeed::ParseEvent() {
             side = Side::Sell;
         }
 
-        TradeEvent tradeEvent{ std::stof(parts[3]), side, quantity };
+        TradeEvent tradeEvent{ std::stof(parts[3].data()), side, quantity };
         // no nrvo or rvo because I return based on branch
         return Event{ timestamp, instrument, tradeEvent };
     } else [[likely]] {
         // is there a cleaner way to do this?
         // this feels expensive
-        int bQuant = std::stoi(parts[9]);
-        int aQuant = std::stoi(parts[7]);
+        int bQuant = std::stoi(parts[9].data());
+        int aQuant = std::stoi(parts[7].data());
         // am I guarding against an impossibility? I know I am for my generated events
         if (bQuant < 0) throw std::runtime_error("Bid quantity < 0");
         if (aQuant < 0) throw std::runtime_error("Ask quantity < 0");
         Quantity buyQuantity{ static_cast<std::uint32_t>(bQuant)};
         Quantity askQuantity{ static_cast<std::uint32_t>(aQuant)};
-        QuoteEvent quoteEvent{ std::stof(parts[8]), buyQuantity, std::stof(parts[6]), askQuantity};
+        QuoteEvent quoteEvent{ std::stof(parts[8].data()), buyQuantity, std::stof(parts[6].data()), askQuantity};
         return Event{ timestamp, instrument, quoteEvent};
     }
 
