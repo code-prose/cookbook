@@ -25,15 +25,17 @@ bool DataFeed::Iterator::operator!=(const Iterator& other) const {
 Event DataFeed::ParseEvent() {
     // stopping string allocation every single loop iteration
     // need to use mapped struct here
-    if (!std::getline(_fs, _line)) {
-        throw std::runtime_error("Could not parse line from input");
+    std::string_view sv{};
+    if (!mfile_.getline(sv)) {
+        std::terminate();
     }
-    std::stringstream ss(_line);
+        
 
     // string allocation every single comma, could use std::string_view
+    // if I don't allocate here then the lifetime is tied to mmap being open
     std::string item;
     std::vector<std::string> parts;
-    while (std::getline(ss, item, ',')) {
+    while (std::getline(sv, item, ',')) {
         parts.push_back(item);
     }
 
@@ -49,11 +51,10 @@ Event DataFeed::ParseEvent() {
     // is there a way to get this information without string comparison?
     // what do I know about this data?
     // I know that I always have the same number of commas
-    // I TECHNICALLY know that the ticker is always TEST-ID
-    // but this is not a good thing to work off of...
     // I know that the first letter after the first comma is always a T or a Q
     // what it be faster to do a SIMD pass over first to determine the type?
     // ... does this even work? I would need a different # of something to determine
+    // do these have the same number of elements? could I change the data format and then precompute and do a cmov?
     if (parts[2] == "trade") [[unlikely]] {
         // parsing logic
         int quant = std::stoi(parts[4]);
