@@ -75,7 +75,7 @@ if __name__ == "__main__":
         description='Generates CSV containing quote and trade events for pasing with backtesting engine',
         epilog=''
     )
-    parser.add_argument('-r', '--rows')
+    parser.add_argument('-r', '--rows', default=1000)
 
     args = parser.parse_args()
 
