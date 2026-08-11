@@ -41,6 +41,7 @@ struct MappedFile {
 
     static std::vector<std::string_view> split_sv(std::string_view& sv) {
         std::vector<std::string_view> vec{};
+        vec.reserve(10);
         const char* begin = sv.begin();
         const char* comma = static_cast<const char*>(std::memchr(begin, ',', sv.end() - begin));
         while (comma) {
