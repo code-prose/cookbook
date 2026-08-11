@@ -13,3 +13,10 @@ add_executable(cookbook
 )
 
 target_include_directories(cookbook PRIVATE include)
+
+add_executable(microbench
+    src/microbench.cpp
+    src/data_feed.cpp
+)
+
+target_include_directories(microbench PRIVATE include)
