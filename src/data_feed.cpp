@@ -21,15 +21,12 @@ bool DataFeed::Iterator::operator!=(const Iterator& other) const {
 }
 
 Event DataFeed::ParseEvent() {
-    // stopping string allocation every single loop iteration
-    // need to use mapped struct here
     std::string_view sv{};
     if (!mfile_.getline(sv)) {
-        std::terminate();
+        throw std::runtime_error("EOF");
+        // can I do this without throwing?
     }
         
-
-    //te string allocation every single comma, could use std::string_view
     // if I don't allocate here then the lifetime is tied to mmap being open
     std::vector<std::string_view> parts{MappedFile::split_sv(sv)};
 
