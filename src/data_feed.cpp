@@ -65,7 +65,7 @@ Event DataFeed::ParseEvent() {
         CustomParsing::int_from_float_chars(parts[3].begin(), parts[3].end(), price);
         TradeEvent tradeEvent{ price, side, quantity };
         // no nrvo or rvo because I return based on branch
-        return Event{ timestamp, instrument, tradeEvent };
+        return Event{ timestamp, std::move(instrument), tradeEvent };
     } else [[likely]] {
         // is there a cleaner way to do this?
         // this feels expensive
@@ -83,7 +83,7 @@ Event DataFeed::ParseEvent() {
         CustomParsing::int_from_float_chars(parts[8].begin(), parts[8].end(), bidPrice);
         CustomParsing::int_from_float_chars(parts[6].begin(), parts[6].end(), askPrice);
         QuoteEvent quoteEvent{ bidPrice, buyQuantity, askPrice, askQuantity};
-        return Event{ timestamp, instrument, quoteEvent};
+        return Event{ timestamp, std::move(instrument), quoteEvent};
     }
 
 }
