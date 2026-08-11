@@ -43,7 +43,7 @@ struct MappedFile {
         std::vector<std::string_view> vec{};
         const char* begin = sv.begin();
         const char* comma = static_cast<const char*>(std::memchr(begin, ',', sv.end() - begin));
-        while(comma) {
+        while (comma) {
            vec.push_back(std::string_view{begin, static_cast<std::size_t>(comma - begin)});
            begin = comma + 1;
            comma = static_cast<const char*>(std::memchr(begin, ',', sv.end() - begin));
@@ -52,7 +52,6 @@ struct MappedFile {
         return vec;
     }
 
-    // bad news is that this is pulling fucking everything?
     bool getline(std::string_view& sv) {
         if (curr_ >= eof_) {
             return false;
