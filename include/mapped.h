@@ -38,6 +38,7 @@ struct MappedFile {
         curr_ = eol + 1;
     }
 
+    // good news is that this works
     static std::vector<std::string_view> split_sv(std::string_view& sv) {
         std::vector<std::string_view> vec{}; 
         const char* comma = static_cast<const char*>(std::memchr(sv.begin(), ',', sv.size()));
@@ -52,11 +53,11 @@ struct MappedFile {
         return vec;
     }
 
+    // bad news is that this is pulling fucking everything?
     bool getline(std::string_view& sv) {
         auto bytes_left = eof_ - curr_;
         const char* eol = static_cast<const char*>(std::memchr(curr_, '\n', bytes_left));
         std::size_t sz = eol - curr_;
-        // need to fix condition
         if (curr_ >= (char*)eof_) {
             std::cout << (void*)curr_ << " " << eof_ << std::endl;
             return false;
