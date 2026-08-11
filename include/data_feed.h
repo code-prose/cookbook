@@ -12,6 +12,7 @@ class DataFeed {
 public:
 
     DataFeed(MappedFile& mfile) : mfile_{mfile} {
+        mfile_.open();
         mfile_.discard_headers();
     }
 

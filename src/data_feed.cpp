@@ -33,8 +33,7 @@ Event DataFeed::ParseEvent() {
     // if I don't allocate here then the lifetime is tied to mmap being open
     std::vector<std::string_view> parts{MappedFile::split_sv(sv)};
 
-    // 0: timestamp, 1: id, 2: type, 3: trade_price, 4: trade_quantity, 5: side, 6: ask_price, 7: ask_quantity, 8: bid_price, 9: bid_quantity
-    // can I use a better data format? can I mock a data stream?
+    // 0: timestamp, 1: id, 2: type, 3: trade_price, 4: trade_quantity, 5: side, 6: ask_price, 7: ask_quantity, 8: bid_price, 9: bid_quantity can I use a better data format? can I mock a data stream?
     std::int64_t since_epoch = std::stoll(parts[0].data());
     Time timestamp{ std::chrono::nanoseconds(since_epoch) };
     std::string instrument = parts[1].data();
