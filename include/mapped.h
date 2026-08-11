@@ -12,6 +12,7 @@
 
 struct MappedFile {
     MappedFile(const std::string& path) : path_{path} {}
+
     void open() {
         fd_ = ::open(path_.c_str(), O_RDONLY);
         if (fd_ == -1) {
@@ -28,7 +29,7 @@ struct MappedFile {
             std::cout << "Failed to map file\n";
             std::terminate();
         }
-        eof_ = mapped_ + size_ - 1;
+        eof_ = mapped_ + size_;
         curr_ = mapped_;
 
     }
@@ -38,33 +39,39 @@ struct MappedFile {
         curr_ = eol + 1;
     }
 
-    // good news is that this works
     static std::vector<std::string_view> split_sv(std::string_view& sv) {
-        std::vector<std::string_view> vec{}; 
-        const char* comma = static_cast<const char*>(std::memchr(sv.begin(), ',', sv.size()));
+        std::vector<std::string_view> vec{};
         const char* begin = sv.begin();
+        const char* comma = static_cast<const char*>(std::memchr(begin, ',', sv.end() - begin));
         while(comma) {
-           vec.push_back(std::string_view{begin, static_cast<std::size_t>(comma - begin)}); 
+           vec.push_back(std::string_view{begin, static_cast<std::size_t>(comma - begin)});
            begin = comma + 1;
-           comma = static_cast<const char*>(std::memchr(begin, ',', sv.size()));
+           comma = static_cast<const char*>(std::memchr(begin, ',', sv.end() - begin));
         }
-        // might need to grab the last one after the comma
-        vec.push_back(std::string_view{begin, static_cast<std::size_t>(sv.end() - sv.begin())});
+        vec.push_back(std::string_view{begin, static_cast<std::size_t>(sv.end() - begin)});
         return vec;
     }
 
     // bad news is that this is pulling fucking everything?
     bool getline(std::string_view& sv) {
+        if (curr_ >= eof_) {
+            return false;
+        }
+
         auto bytes_left = eof_ - curr_;
         const char* eol = static_cast<const char*>(std::memchr(curr_, '\n', bytes_left));
-        std::size_t sz = eol - curr_;
-        if (curr_ >= (char*)eof_) {
-            std::cout << (void*)curr_ << " " << eof_ << std::endl;
-            return false;
-        } 
 
-        sv = std::string_view{curr_, sz};
-        curr_ = eol + 1;
+        std::size_t sz;
+        const char* line_start = curr_;
+        if (eol) {
+            sz = eol - curr_;
+            curr_ = eol + 1;
+        } else {
+            sz = bytes_left;
+            curr_ = eof_;
+        }
+
+        sv = std::string_view{line_start, sz};
         return true;
     }
 
