@@ -1,5 +1,6 @@
 #include "types.h"
 #include "data_feed.h"
+#include "parsing.h"
 #include <chrono>
 #include <charconv>
 #include <stdexcept>
@@ -60,8 +61,8 @@ Event DataFeed::ParseEvent() {
             side = Side::Sell;
         }
 
-        float price{};
-        std::from_chars(parts[3].begin(), parts[3].end(), price);
+        std::uint64_t price{};
+        CustomParsing::int_from_float_chars(parts[3].begin(), parts[3].end(), price);
         TradeEvent tradeEvent{ price, side, quantity };
         // no nrvo or rvo because I return based on branch
         return Event{ timestamp, instrument, tradeEvent };
@@ -77,10 +78,10 @@ Event DataFeed::ParseEvent() {
         if (aQuant < 0) throw std::runtime_error("Ask quantity < 0");
         Quantity buyQuantity{ static_cast<std::uint32_t>(bQuant)};
         Quantity askQuantity{ static_cast<std::uint32_t>(aQuant)};
-        float bidPrice{};
-        float askPrice{};
-        std::from_chars(parts[8].begin(), parts[8].end(), bidPrice);
-        std::from_chars(parts[6].begin(), parts[6].end(), askPrice);
+        std::uint64_t bidPrice{};
+        std::uint64_t askPrice{};
+        CustomParsing::int_from_float_chars(parts[8].begin(), parts[8].end(), bidPrice);
+        CustomParsing::int_from_float_chars(parts[6].begin(), parts[6].end(), askPrice);
         QuoteEvent quoteEvent{ bidPrice, buyQuantity, askPrice, askQuantity};
         return Event{ timestamp, instrument, quoteEvent};
     }
