@@ -14,12 +14,12 @@ def generate(rows: int = 1000):
     price = [50000.0]
     for _ in range(1, rows):
         noise = np.random.normal(0, 1)
-        price.append(price[-1] + noise)
+        price.append(round(price[-1] + noise, 4))
 
     quantity = [150]
     for _ in range(1, rows):
         noise = np.random.randint(1, 100)
-        quantity.append(quantity[-1] + noise)
+        quantity.append(round(quantity[-1] + noise, 4))
 
     # 0: timestamp, 1: id (instruments), 2: type, 3: trade_price, 4: trade_quantity, 5: side, 6: ask_price, 7: ask_quantity, 8: bid_price, 9: bid_quantity
     df = pl.DataFrame({
