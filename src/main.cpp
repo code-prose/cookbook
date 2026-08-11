@@ -11,7 +11,8 @@ int main(int argc, char * argv[]) {
 
     EventLoop event_loop{ };
     OrderBook ob{ };
-    NaiveStrategy ns{ob, 50'000.0f, 0.1f};
+    // using std::uint64_t now
+    NaiveStrategy ns{ob, 50'000 * 10'000, 0.1f};
     event_loop.AddHandler([&ns](const Event& e) { ns.execute(e); });
 
     for (auto& event : data_feed) {

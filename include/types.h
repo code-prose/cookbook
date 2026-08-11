@@ -10,7 +10,7 @@ using Quantity = std::uint32_t;
 using OrderID = std::uint64_t;
 
 using StrategyQuantity = std::int32_t;
-using StrategyBalance = float;
+using StrategyBalance = std::uint64_t;
 
 
 enum class OrderType {
