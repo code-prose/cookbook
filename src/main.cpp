@@ -18,5 +18,6 @@ int main(int argc, char * argv[]) {
         event_loop.AddEvent(event);
     }
 
+    // I do not need this for perf testing the data_feed
     event_loop.run();
 }
