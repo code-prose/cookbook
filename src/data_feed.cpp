@@ -5,6 +5,8 @@
 #include <charconv>
 #include <stdexcept>
 
+
+
 const Event& DataFeed::Iterator::operator*() const {
     return _current;
 };
@@ -23,7 +25,7 @@ bool DataFeed::Iterator::operator!=(const Iterator& other) const {
 }
 
 Event DataFeed::ParseEvent() {
-    // 0: timestamp, 1: id, 2: type, 3: trade_price, 4: trade_quantity, 5: side, 6: ask_price, 7: ask_quantity, 8: bid_price, 9: bid_quantity can I use a better data format? can I mock a data stream?
+    // 0: timestamp, 1: id, 2: type, 3: trade_price, 4: trade_quantity, 5: side, 6: ask_price, 7: ask_quantity, 8: bid_price, 9: bid_quantity
     std::string_view sv{};
     if (!mfile_.getline(sv)) {
         throw std::runtime_error("EOF");
@@ -31,39 +33,46 @@ Event DataFeed::ParseEvent() {
     }
         
     std::vector<std::string_view> parts{MappedFile::split_sv(sv)};
+    constexpr std::uint64_t chunk_1 = 1e16;
+    constexpr std::uint64_t chunk_2 = 1e8;
 
-    // move to swar
     std::uint64_t since_epoch{0};
     auto ptr = parts[0].data();
-    for (auto i{0uz}; i < 19; i++) {
+    for (auto i{0uz}; i < 3; i++) {
         since_epoch = since_epoch * 10 + static_cast<std::uint64_t>(*(ptr + i) - '0');
     }
+
+    {
+        using namespace CustomParsing;
+        since_epoch = since_epoch * chunk_1 + swar_eight_digits(parts[0].begin() + 3) * chunk_2 + swar_eight_digits(parts[0].begin() + 11);
+    }
+
     Time timestamp{ std::chrono::nanoseconds(since_epoch) };
     std::string instrument{parts[1]};
 
-    // the branch predictor is actually super accurate here and precompute with cmov would just add unnecessary latency
+    // the branch predictor is actually super accurate here and precompute with cmov would just add unnecessary compute cost
     // always check first...
     // data:
     // events: 2000000
-    // elapsed: 0.170286s
-    // ns/event: 85.1432
+    // elapsed: 0.160874s
+    // ns/event: 80.437
     // checksum: 8198660791791185920
     //
     //  Performance counter stats for './build/microbench':
     //
-    //             170.99 msec task-clock:u
-    //        736,144,717      cycles:u                                                                (83.00%)
-    //      2,632,964,826      instructions:u                                                          (83.04%)
-    //          4,926,044      cache-references:u                                                      (83.47%)
-    //             40,373      cache-misses:u                                                          (83.62%)
-    //        625,292,269      branches:u                                                              (83.65%)
-    //          1,589,856      branch-misses:u                                                         (83.21%)
+    //             161.66 msec task-clock:u
+    //        695,626,348      cycles:u                                                                (83.32%)
+    //      2,436,452,410      instructions:u                                                          (83.28%)
+    //          4,947,512      cache-references:u                                                      (83.29%)
+    //             37,533      cache-misses:u                                                          (82.71%)
+    //        587,122,078      branches:u                                                              (83.92%)
+    //          1,582,051      branch-misses:u                                                         (83.48%)
     //
-    //        0.171796613 seconds time elapsed
+    //        0.162458273 seconds time elapsed
     //
-    //        0.169223000 seconds user
-    //        0.000996000 seconds sys
-    //  1,589,856 / 625,292,269 ~= .25% misprediction
+    //        0.157943000 seconds user
+    //        0.003005000 seconds sys
+    //  1,582,051 / 587,122,078 ~= .27% misprediction
     if (parts[2] == "trade") [[unlikely]] {
         // parsing logic
         int quant{};

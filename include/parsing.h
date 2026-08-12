@@ -20,4 +20,18 @@ namespace CustomParsing {
 
       val = whole * powtable[4] + frac * powtable[4 - frac_digits];
    } 
+
+   constexpr std::uint64_t Splat8Char0 =  0x3030303030303030;
+   constexpr std::uint64_t mask = 0x000000FF000000FF;
+   constexpr std::uint64_t mul1 = 100 + (1'000'000ULL << 32); // = 0x000F424000000064
+   constexpr std::uint64_t mul2 = 1 + (10'000ULL << 32); // = 0x0000271000000001
+
+   inline std::uint64_t swar_eight_digits(const char* chars) {
+      uint64_t val;
+      memcpy(&val, chars, 8);
+      val -= Splat8Char0;
+      val = (val * 10) + (val >> 8);
+      val = ((val & mask) * mul1 + ((val >> 16) & mask) * mul2) >> 32;
+      return val;
+   }
 };
