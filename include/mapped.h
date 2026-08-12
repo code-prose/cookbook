@@ -29,6 +29,7 @@ struct MappedFile {
             std::cout << "Failed to map file\n";
             std::terminate();
         }
+        madvise((void*)mapped_, file_stats.st_size, MADV_SEQUENTIAL);
         eof_ = mapped_ + size_;
         curr_ = mapped_;
 

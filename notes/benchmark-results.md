@@ -41,3 +41,20 @@ Hot lines in `ParseEvent`:
 - L30 `stringsteam` ctor - 59
 - L40 `Time` ctor - 57
 - L80 `QuoteEvent` ctor - 35
+
+
+## Perf Results
+```
+
+ Performance counter stats for './build/microbench' (10 runs):
+
+            139.38 msec task-clock:u                                                            ( +-  1.97% )
+       636,589,344      cycles:u                                                                ( +-  0.43% )  (83.05%)
+     2,214,346,469      instructions:u                                                          ( +-  0.08% )  (82.32%)
+         5,388,005      cache-references:u                                                      ( +-  9.17% )  (83.38%)
+            40,553      cache-misses:u                                                          ( +-  4.57% )  (83.86%)
+       526,918,709      branches:u                                                              ( +-  0.06% )  (83.81%)
+         1,571,404      branch-misses:u                                                         ( +-  0.22% )  (83.57%)
+
+       0.140149011 +- 0.002758615 seconds time elapsed  ( +-  1.97% )
+```
