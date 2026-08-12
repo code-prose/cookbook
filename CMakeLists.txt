@@ -20,3 +20,4 @@ add_executable(microbench
 )
 
 target_include_directories(microbench PRIVATE include)
+target_compile_options(microbench PRIVATE -O2 -g -fno-omit-frame-pointer)
