@@ -49,7 +49,8 @@ Event DataFeed::ParseEvent() {
     }
 
     Time timestamp{ std::chrono::nanoseconds(since_epoch) };
-    std::string instrument{parts[1]};
+    std::array<char, 4> instrument{};
+    std::memcpy(&instrument, parts[1].data(), 4);
 
     // the branch predictor is actually super accurate here and precompute with cmov would just add unnecessary compute cost
     // always check first...
