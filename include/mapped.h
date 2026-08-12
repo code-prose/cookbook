@@ -6,6 +6,7 @@
 #include <cstring>
 #include <array>
 
+#include <immintrin.h>
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -41,18 +42,38 @@ struct MappedFile {
     }
 
     // it is time for this to die... onto SIMD
+    // trades ~60B, quotes ~74B
     static std::array<std::string_view, 10> split_sv(std::string_view& sv) {
-        std::array<std::string_view, 10> arr{};
-        const char* begin = sv.begin();
-        const char* comma = static_cast<const char*>(std::memchr(begin, ',', sv.end() - begin));
-        std::size_t index = 0;
-        while (comma) {
-           arr[index++] = std::string_view{begin, static_cast<std::size_t>(comma - begin)};
-           begin = comma + 1;
-           comma = static_cast<const char*>(std::memchr(begin, ',', sv.end() - begin));
+        constexpr auto NUM_COMMAS{9uz};
+        std::array<std::string_view, 10> split{};
+        const auto SPLATCOMMA = _mm512_set1_epi8(',');
+        auto vectorized = _mm512_loadu_epi8(sv.data());
+        auto mask = _mm512_cmpeq_epi8_mask(vectorized, SPLATCOMMA);
+        auto next = _tzcnt_u64(mask);
+        auto index{0uz};
+        auto curr = sv.begin();
+        auto count = 0;
+        while (next < 64 && count != NUM_COMMAS) {
+            auto comma = sv.data() + next;
+            split[index++] = std::string_view{curr, static_cast<std::size_t>(comma - curr)}; 
+            curr = comma + 1;
+            mask &= mask - 1;
+            next = _tzcnt_u64(mask);
         }
-        arr[index] = std::string_view{begin, static_cast<std::size_t>(sv.end() - begin)};
-        return arr;
+        // grab last
+        if (count == NUM_COMMAS) {
+            split[index] = std::string_view{curr, static_cast<std::size_t>(sv.end() - curr)};
+        } else { // or grab remaining
+            auto newer = curr;
+            const char* next_comma = static_cast<const char*>(std::memchr(curr, ',', sv.end() - curr));
+            while (next_comma) {
+               split[index++] = std::string_view{curr, static_cast<std::size_t>(next_comma - curr)};
+               curr = next_comma + 1;
+               next_comma = static_cast<const char*>(std::memchr(curr, ',', sv.end() - curr));
+            }
+            split[index] = std::string_view{curr, static_cast<std::size_t>(sv.end() - curr)};
+        }
+        return split;
     }
 
     bool getline(std::string_view& sv) {

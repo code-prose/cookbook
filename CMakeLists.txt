@@ -13,6 +13,7 @@ add_executable(cookbook
 )
 
 target_include_directories(cookbook PRIVATE include)
+target_compile_options(cookbook PRIVATE -mavx512f -mavx512bw -mbmi)
 
 add_executable(microbench
     src/microbench.cpp
@@ -20,4 +21,11 @@ add_executable(microbench
 )
 
 target_include_directories(microbench PRIVATE include)
-target_compile_options(microbench PRIVATE -O2 -g -fno-omit-frame-pointer)
+target_compile_options(microbench PRIVATE -O2 -g -fno-omit-frame-pointer -mavx512f -mavx512bw -mbmi)
+
+add_executable(test
+    src/test.cpp
+)
+
+target_include_directories(test PRIVATE include)
+target_compile_options(test PRIVATE -O2 -g -fno-omit-frame-pointer -mavx512f -mavx512bw -mbmi)

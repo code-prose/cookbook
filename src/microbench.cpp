@@ -1,6 +1,7 @@
 #include "mapped.h"
 #include "data_feed.h"
 #include <chrono>
+#include <cassert>
 #include <iostream>
 
 int main() {
@@ -24,5 +25,6 @@ int main() {
     std::cout << "ns/event: " << (elapsed * 1e9 / static_cast<double>(count)) << "\n";
     // keeps the compiler from optimizing the whole loop away
     std::cout << "checksum: " << checksum << "\n";
+    assert(checksum == 8198660791791185920);
     return 0;
 }
