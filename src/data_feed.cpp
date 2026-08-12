@@ -34,8 +34,9 @@ Event DataFeed::ParseEvent() {
 
     // 0: timestamp, 1: id, 2: type, 3: trade_price, 4: trade_quantity, 5: side, 6: ask_price, 7: ask_quantity, 8: bid_price, 9: bid_quantity can I use a better data format? can I mock a data stream?
     std::uint64_t since_epoch{0};
-    for (auto i{parts[0].begin()}; i != parts[0].end(); i++) {
-        since_epoch = since_epoch * 10 + static_cast<std::uint64_t>(*i - '0');
+    auto ptr = parts[0].data();
+    for (auto i{0uz}; i < 19; i++) {
+        since_epoch = since_epoch * 10 + static_cast<std::uint64_t>(*(ptr + i) - '0');
     }
     Time timestamp{ std::chrono::nanoseconds(since_epoch) };
     std::string instrument{parts[1]};
