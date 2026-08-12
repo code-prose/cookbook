@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string_view>
 #include <cstring>
-#include <vector>
+#include <array>
 
 #include <sys/mman.h>
 #include <fcntl.h>
@@ -39,18 +39,19 @@ struct MappedFile {
         curr_ = eol + 1;
     }
 
-    static std::vector<std::string_view> split_sv(std::string_view& sv) {
-        std::vector<std::string_view> vec{};
-        vec.reserve(10);
+    // it is time for this to die... onto SIMD
+    static std::array<std::string_view, 10> split_sv(std::string_view& sv) {
+        std::array<std::string_view, 10> arr{};
         const char* begin = sv.begin();
         const char* comma = static_cast<const char*>(std::memchr(begin, ',', sv.end() - begin));
+        std::size_t index = 0;
         while (comma) {
-           vec.push_back(std::string_view{begin, static_cast<std::size_t>(comma - begin)});
+           arr[index++] = std::string_view{begin, static_cast<std::size_t>(comma - begin)};
            begin = comma + 1;
            comma = static_cast<const char*>(std::memchr(begin, ',', sv.end() - begin));
         }
-        vec.push_back(std::string_view{begin, static_cast<std::size_t>(sv.end() - begin)});
-        return vec;
+        arr[index] = std::string_view{begin, static_cast<std::size_t>(sv.end() - begin)};
+        return arr;
     }
 
     bool getline(std::string_view& sv) {

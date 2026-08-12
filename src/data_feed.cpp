@@ -4,6 +4,7 @@
 #include <chrono>
 #include <charconv>
 #include <stdexcept>
+#include <array>
 
 
 
@@ -32,7 +33,7 @@ Event DataFeed::ParseEvent() {
         // can I do this without throwing?
     }
         
-    std::vector<std::string_view> parts{MappedFile::split_sv(sv)};
+    std::array<std::string_view, 10> parts{MappedFile::split_sv(sv)};
     constexpr std::uint64_t chunk_1 = 1e16;
     constexpr std::uint64_t chunk_2 = 1e8;
 
