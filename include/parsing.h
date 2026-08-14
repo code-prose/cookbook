@@ -12,12 +12,16 @@ namespace CustomParsing {
     void int_from_float_chars(T begin, T end, std::uint64_t& val) {
        auto decimal = static_cast<const char*>(std::memchr(begin, '.', static_cast<std::size_t>(end - begin)));
 
-       std::uint64_t whole{};
-       std::from_chars(begin, decimal, whole);
+       std::uint64_t whole = 0;
+       for (const char* i{begin}; i != decimal; i++) {
+           whole = whole * 10 + static_cast<std::uint64_t>(*i - '0');
+       }
 
        std::uint64_t frac{};
-       auto [ptr, ec] = std::from_chars(decimal + 1, end, frac);
-       auto frac_digits = static_cast<std::size_t>(ptr - (decimal + 1));
+       for (const char* i{decimal + 1}; i != end; i++) {
+           frac = frac * 10 + static_cast<std::uint64_t>(*i - '0');
+       }
+       auto frac_digits = static_cast<std::size_t>(end - (decimal + 1));
 
        val = whole * powtable[4] + frac * powtable[4 - frac_digits];
     } 
