@@ -47,7 +47,7 @@ struct TradeEvent {
 
 struct Event {
     Time timestamp;
-    std::array<char, 4> instrument;
+    std::array<char, 5> instrument;
     std::variant<TradeEvent, QuoteEvent> payload;
 
     bool operator<(const Event& other) const {
