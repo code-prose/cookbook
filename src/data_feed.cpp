@@ -78,7 +78,10 @@ Event DataFeed::ParseEvent() {
     if (parts[2] == "trade") [[unlikely]] {
         // parsing logic
         int quant{};
-        std::from_chars(parts[4].begin(), parts[4].end(), quant);
+        {
+            using namespace CustomParsing;
+            quant = left_pad_and_swar<int>(parts[4]);
+        }
         if (quant < 0) throw std::runtime_error("Quantity < 0"); // kinda gross.. tom said to think about using less exceptions
         Quantity quantity{static_cast<std::uint32_t>(quant)};
         Side side;

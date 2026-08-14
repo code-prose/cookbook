@@ -40,10 +40,10 @@ namespace CustomParsing {
     template <typename T>
     inline auto left_pad_and_swar(std::string_view& sv) -> T {
         std::array<char, 8> t_arr{};
-        memset(t_arr.data(), '0', 8);
+        std::memset(t_arr.data(), '0', 8);
         auto sz = sv.size();
         auto start = 8 - sz;
-        memcpy(t_arr.data() + start, sv.data(), sz);
+        std::memcpy(t_arr.data() + start, sv.data(), sz);
         
         return swar_eight_digits<T>(t_arr.data());  
     }
