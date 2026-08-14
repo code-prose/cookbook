@@ -2,7 +2,6 @@
 #include "data_feed.h"
 #include "parsing.h"
 #include <chrono>
-#include <charconv>
 #include <stdexcept>
 #include <array>
 
@@ -55,26 +54,18 @@ Event DataFeed::ParseEvent() {
     // the branch predictor is actually super accurate here and precompute with cmov would just add unnecessary compute cost
     // always check first...
     // data:
-    // events: 2000000
-    // elapsed: 0.160874s
-    // ns/event: 80.437
-    // checksum: 8198660791791185920
+    // Performance counter stats for './build/microbench' (10 runs):
     //
-    //  Performance counter stats for './build/microbench':
+    //             86.21 msec task-clock:u                                                            ( +-  1.67% )
+    //       379,503,799      cycles:u                                                                ( +-  0.67% )  (82.79%)
+    //     1,346,215,416      instructions:u                                                          ( +-  0.07% )  (82.71%)
+    //         4,780,215      cache-references:u                                                      ( +-  0.09% )  (83.36%)
+    //            34,149      cache-misses:u                                                          ( +-  2.26% )  (84.04%)
+    //       208,179,326      branches:u                                                              ( +-  0.08% )  (83.97%)
+    //         1,714,586      branch-misses:u                                                         ( +-  0.10% )  (83.12%)
     //
-    //             161.66 msec task-clock:u
-    //        695,626,348      cycles:u                                                                (83.32%)
-    //      2,436,452,410      instructions:u                                                          (83.28%)
-    //          4,947,512      cache-references:u                                                      (83.29%)
-    //             37,533      cache-misses:u                                                          (82.71%)
-    //        587,122,078      branches:u                                                              (83.92%)
-    //          1,582,051      branch-misses:u                                                         (83.48%)
-    //
-    //        0.162458273 seconds time elapsed
-    //
-    //        0.157943000 seconds user
-    //        0.003005000 seconds sys
-    //  1,582,051 / 587,122,078 ~= .27% misprediction
+    //       0.087101473 +- 0.001449441 seconds time elapsed  ( +-  1.66% )
+    //  1,714,586 / 208,179,326 ~= .8% misprediction
     if (parts[2] == "trade") [[unlikely]] {
         // parsing logic
         int quant{};
