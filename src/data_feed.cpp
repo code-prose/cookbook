@@ -45,7 +45,7 @@ Event DataFeed::ParseEvent() {
 
     {
         using namespace CustomParsing;
-        since_epoch = since_epoch * chunk_1 + swar_eight_digits(parts[0].begin() + 3) * chunk_2 + swar_eight_digits(parts[0].begin() + 11);
+        since_epoch = since_epoch * chunk_1 + swar_eight_digits<std::uint64_t>(parts[0].begin() + 3) * chunk_2 + swar_eight_digits<std::uint64_t>(parts[0].begin() + 11);
     }
 
     Time timestamp{ std::chrono::nanoseconds(since_epoch) };
@@ -80,7 +80,7 @@ Event DataFeed::ParseEvent() {
         int quant{};
         std::from_chars(parts[4].begin(), parts[4].end(), quant);
         if (quant < 0) throw std::runtime_error("Quantity < 0"); // kinda gross.. tom said to think about using less exceptions
-        Quantity quantity{ static_cast<std::uint32_t>(quant)};
+        Quantity quantity{static_cast<std::uint32_t>(quant)};
         Side side;
         if (parts[5] == "buy") {
             side = Side::Buy;
@@ -95,14 +95,19 @@ Event DataFeed::ParseEvent() {
     } else [[likely]] {
         int bQuant{};
         int aQuant{};
-        std::from_chars(parts[9].begin(), parts[9].end(), bQuant);
-        std::from_chars(parts[7].begin(), parts[7].end(), aQuant);
+        {
+            using namespace CustomParsing;
+            bQuant = left_pad_and_swar<int>(parts[9]);
+            aQuant = left_pad_and_swar<int>(parts[7]);
+        }
+        // std::from_chars(parts[9].begin(), parts[9].end(), bQuant);
+        // std::from_chars(parts[7].begin(), parts[7].end(), aQuant);
         // am I guarding against an impossibility? I know I am for my generated events
         // I will almost never guess these wrong but maybe I should handle different than throwing an err
         if (bQuant < 0) throw std::runtime_error("Bid quantity < 0");
         if (aQuant < 0) throw std::runtime_error("Ask quantity < 0");
-        Quantity buyQuantity{ static_cast<std::uint32_t>(bQuant)};
-        Quantity askQuantity{ static_cast<std::uint32_t>(aQuant)};
+        Quantity buyQuantity{static_cast<std::uint32_t>(bQuant)};
+        Quantity askQuantity{static_cast<std::uint32_t>(aQuant)};
         std::uint64_t bidPrice{};
         std::uint64_t askPrice{};
         CustomParsing::int_from_float_chars(parts[8].begin(), parts[8].end(), bidPrice);
