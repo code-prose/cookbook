@@ -12,6 +12,7 @@ void Order::Fill(Quantity quantity) {
     _remainingQuantity -= quantity;
 }
 
+// revist this!
 // something like this? let templating handle it? cppcon talk mentioned this - https://www.youtube.com/watch?v=NH1Tta7purM
 // template <Side side>
 // bool OrderBook<side>::CanMatch(Price price) {
