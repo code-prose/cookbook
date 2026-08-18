@@ -36,15 +36,12 @@ Event DataFeed::ParseEvent() {
     constexpr std::uint64_t chunk_1 = 1e16;
     constexpr std::uint64_t chunk_2 = 1e8;
 
-    std::uint64_t since_epoch{0};
-    auto ptr = parts[0].data();
-    for (auto i{0uz}; i < 3; i++) {
-        since_epoch = since_epoch * 10 + static_cast<std::uint64_t>(*(ptr + i) - '0');
-    }
-
+    // timestamp parsing
+    auto since_epoch = CustomParsing::parse_timestamp_beginning(parts[0]);
     {
         using namespace CustomParsing;
-        since_epoch = since_epoch * chunk_1 + swar_eight_digits<std::uint64_t>(parts[0].begin() + 3) * chunk_2 + swar_eight_digits<std::uint64_t>(parts[0].begin() + 11);
+        auto epoch_ptr = parts[0].begin();
+        since_epoch = since_epoch * chunk_1 + swar_eight_digits<std::uint64_t>(epoch_ptr + 3) * chunk_2 + swar_eight_digits<std::uint64_t>(epoch_ptr + 11);
     }
 
     Time timestamp{ std::chrono::nanoseconds(since_epoch) };
