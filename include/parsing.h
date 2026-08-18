@@ -51,4 +51,13 @@ namespace CustomParsing {
         
         return swar_eight_digits<T>(t_arr.data());  
     }
+
+    inline std::uint64_t parse_timestamp_beginning(std::string_view& sv) {
+        std::uint64_t since_epoch{0};
+        auto ptr = sv.data();
+        for (auto i{0uz}; i < 3; i++) {
+            since_epoch = since_epoch * 10 + static_cast<std::uint64_t>(*(ptr + i) - '0');
+        }
+        return since_epoch;
+    }
 };
