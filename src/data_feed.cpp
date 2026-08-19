@@ -91,8 +91,6 @@ Event DataFeed::ParseEvent() {
             bQuant = left_pad_and_swar<int>(parts[9]);
             aQuant = left_pad_and_swar<int>(parts[7]);
         }
-        // std::from_chars(parts[9].begin(), parts[9].end(), bQuant);
-        // std::from_chars(parts[7].begin(), parts[7].end(), aQuant);
         // am I guarding against an impossibility? I know I am for my generated events
         // I will almost never guess these wrong but maybe I should handle different than throwing an err
         if (bQuant < 0) throw std::runtime_error("Bid quantity < 0");
