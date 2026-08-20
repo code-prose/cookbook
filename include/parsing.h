@@ -42,7 +42,7 @@ namespace CustomParsing {
     }
 
     template <typename T>
-    inline auto left_pad_and_swar(std::string_view& sv) -> T {
+    inline auto left_pad_and_swar(const std::string_view& sv) -> T {
         std::array<char, 8> t_arr{};
         std::memset(t_arr.data(), '0', 8);
         auto sz = sv.size();
@@ -52,7 +52,7 @@ namespace CustomParsing {
         return swar_eight_digits<T>(t_arr.data());  
     }
 
-    inline std::uint64_t parse_timestamp_beginning(std::string_view& sv) {
+    inline std::uint64_t parse_timestamp_beginning(const std::string_view& sv) {
         std::uint64_t since_epoch{0};
         auto ptr = sv.data();
         for (auto i{0uz}; i < 3; i++) {

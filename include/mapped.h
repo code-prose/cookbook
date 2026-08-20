@@ -43,7 +43,7 @@ struct MappedFile {
 
     // it is time for this to die... onto SIMD
     // trades ~60B, quotes ~74B
-    static std::array<std::string_view, 10> split_sv(std::string_view& sv) {
+    static std::array<std::string_view, 10> split_sv(const std::string_view& sv) {
         constexpr auto NUM_COMMAS{9uz};
         std::array<std::string_view, 10> split{};
         const auto SPLATCOMMA = _mm512_set1_epi8(',');
