@@ -63,7 +63,7 @@ Event DataFeed::ParseEvent() {
     //
     //       0.087101473 +- 0.001449441 seconds time elapsed  ( +-  1.66% )
     //  1,714,586 / 208,179,326 ~= .8% misprediction
-    if (parts[2] == "trade") [[unlikely]] {
+    if (parts[2] == QuoteType::Trade) [[unlikely]] {
         // parsing logic
         int quant{};
         {
@@ -83,7 +83,7 @@ Event DataFeed::ParseEvent() {
         CustomParsing::int_from_float_chars(parts[3].begin(), parts[3].end(), price);
         TradeEvent tradeEvent{ price, side, quantity };
         return Event{ timestamp, std::move(instrument), tradeEvent };
-    } else [[likely]] {
+    } else if (parts[2] == QuoteType::Quote) [[likely]] {
         int bQuant{};
         int aQuant{};
         {
@@ -104,6 +104,9 @@ Event DataFeed::ParseEvent() {
         QuoteEvent quoteEvent{ bidPrice, buyQuantity, askPrice, askQuantity};
         return Event{ timestamp, std::move(instrument), quoteEvent};
     }
+
+    // Impossible to reach, probably a better way to handle this though
+    std::terminate();
 }
 
 DataFeed::Iterator DataFeed::begin() {

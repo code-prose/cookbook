@@ -21,6 +21,14 @@ enum class OrderType {
   BuyStopOrder,
 };
 
+
+struct QuoteType {
+    static constexpr std::string_view Trade = "trade";
+    static constexpr std::string_view Quote = "quote";
+
+    QuoteType() = delete; 
+};
+
 enum class Side { Buy, Sell };
 
 struct LevelInfo {
