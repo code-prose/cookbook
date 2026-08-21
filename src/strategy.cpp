@@ -42,7 +42,7 @@ void NaiveStrategy::OnTrade(const TradeEvent &event) {
 }
 
 void NaiveStrategy::OnQuote(const QuoteEvent &event) {
-  float mid = (event.ask_price + event.bid_price) / 2;
+  float mid = (event.ask_price + event.bid_price) / 2.0f;
   if (_ema == 0.0f)
     _ema = mid;
   else
