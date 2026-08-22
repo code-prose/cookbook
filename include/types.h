@@ -4,7 +4,6 @@
 #include <variant>
 #include <vector>
 
-// using this for ease now... let's switch this back to unint32_t and change the parser and then handle the arithmetic for perf
 using Price = std::uint64_t;
 using Quantity = std::uint32_t;
 using OrderID = std::uint64_t;
