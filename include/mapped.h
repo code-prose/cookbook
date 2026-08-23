@@ -10,6 +10,7 @@
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 struct MappedFile {
     MappedFile(const std::string& path) : path_{path} {}
@@ -25,7 +26,17 @@ struct MappedFile {
         fstat(fd_, &file_stats);
         size_ = file_stats.st_size;
 
-        mapped_ = static_cast<const char*>(mmap(0, file_stats.st_size, PROT_READ, MAP_PRIVATE, fd_, 0));
+
+        long page_size = ::sysconf(_SC_PAGESIZE);
+        std::size_t aligned_size = (size_ + page_size - 1) & ~(page_size - 1);
+        guard_size_ = aligned_size + page_size;
+        auto guarded = mmap(nullptr, guard_size_, PROT_READ, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+        if (guarded == MAP_FAILED) {
+            std::cout << "Failed to reserve guard space\n";
+            std::terminate();
+        }
+
+        mapped_ = static_cast<const char*>(mmap(guarded, file_stats.st_size, PROT_READ, MAP_PRIVATE | MAP_FIXED, fd_, 0));
         if (mapped_ == MAP_FAILED) {
             std::cout << "Failed to map file\n";
             std::terminate();
@@ -104,7 +115,7 @@ struct MappedFile {
         if (fd_ == -1) std::terminate();
         if (mapped_ == MAP_FAILED) std::terminate();
 
-        munmap((void*)mapped_, size_);
+        munmap((void*)mapped_, guard_size_);
     }
 
     const char* eof_{};
@@ -114,4 +125,5 @@ struct MappedFile {
         const char* curr_{};
         std::string path_{};
         std::size_t size_{};
+        std::size_t guard_size_{};
 };
