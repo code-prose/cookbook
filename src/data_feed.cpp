@@ -48,21 +48,6 @@ Event DataFeed::ParseEvent() {
     std::array<char, 5> instrument{};
     std::memcpy(&instrument, parts[1].data(), parts[1].size());
 
-    // the branch predictor is actually super accurate here and precompute with cmov would just add unnecessary compute cost
-    // always check first...
-    // data:
-    // Performance counter stats for './build/microbench' (10 runs):
-    //
-    //             86.21 msec task-clock:u                                                            ( +-  1.67% )
-    //       379,503,799      cycles:u                                                                ( +-  0.67% )  (82.79%)
-    //     1,346,215,416      instructions:u                                                          ( +-  0.07% )  (82.71%)
-    //         4,780,215      cache-references:u                                                      ( +-  0.09% )  (83.36%)
-    //            34,149      cache-misses:u                                                          ( +-  2.26% )  (84.04%)
-    //       208,179,326      branches:u                                                              ( +-  0.08% )  (83.97%)
-    //         1,714,586      branch-misses:u                                                         ( +-  0.10% )  (83.12%)
-    //
-    //       0.087101473 +- 0.001449441 seconds time elapsed  ( +-  1.66% )
-    //  1,714,586 / 208,179,326 ~= .8% misprediction
     if (parts[2] == QuoteType::Trade) [[unlikely]] {
         // parsing logic
         int quant{};
