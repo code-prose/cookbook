@@ -29,7 +29,6 @@ Event DataFeed::ParseEvent() {
     std::string_view sv{};
     if (!mfile_.getline(sv)) {
         throw std::runtime_error("EOF");
-        // can I do this without throwing?
     }
         
     std::array<std::string_view, 10> parts{MappedFile::split_sv(sv)};
@@ -49,7 +48,6 @@ Event DataFeed::ParseEvent() {
     std::memcpy(&instrument, parts[1].data(), parts[1].size());
 
     if (parts[2] == QuoteType::Trade) [[unlikely]] {
-        // parsing logic
         int quant{};
         {
             using namespace CustomParsing;
@@ -76,10 +74,6 @@ Event DataFeed::ParseEvent() {
             bQuant = left_pad_and_swar<int>(parts[9]);
             aQuant = left_pad_and_swar<int>(parts[7]);
         }
-        // am I guarding against an impossibility? I know I am for my generated events
-        // I will almost never guess these wrong but maybe I should handle different than throwing an err
-        if (bQuant < 0) throw std::runtime_error("Bid quantity < 0");
-        if (aQuant < 0) throw std::runtime_error("Ask quantity < 0");
         Quantity buyQuantity{static_cast<std::uint32_t>(bQuant)};
         Quantity askQuantity{static_cast<std::uint32_t>(aQuant)};
         std::uint64_t bidPrice{};
