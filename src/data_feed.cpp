@@ -4,6 +4,7 @@
 #include <chrono>
 #include <stdexcept>
 #include <array>
+#include <utility>
 
 
 
@@ -85,7 +86,7 @@ Event DataFeed::ParseEvent() {
     }
 
     // Impossible to reach, probably a better way to handle this though
-    std::terminate();
+    std::unreachable();
 }
 
 DataFeed::Iterator DataFeed::begin() {
